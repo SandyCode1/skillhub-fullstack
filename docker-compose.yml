@@ -1,0 +1,62 @@
+# version: "3.8"
+# services:
+#   backend:
+#     build:
+#       context: .  # This is the root folder (where your docker-compose.yml is located)
+#       dockerfile: SkillHub.UserService/Dockerfile  # Path to the Dockerfile for the backend
+#     ports:
+#       - "5000:8080"
+#     depends_on:
+#       - db
+
+#   db:
+#     image: mcr.microsoft.com/mssql/server:2022-latest
+#     container_name: sqlserver
+#     ports:
+#       - "1433:1433"
+#     environment:
+#       SA_PASSWORD: "YourStrong!Passw0rd"
+#       ACCEPT_EULA: "Y"
+
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: SkillHub.UserService/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - sqlserver
+    networks:
+      - skillhub-network
+
+  frontend:
+    build:
+      context: ./skillhub-react
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+    networks:
+      - skillhub-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "YourStrong!Pass123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    networks:
+      - skillhub-network
+
+networks:
+  skillhub-network:
+    driver: bridge
+
