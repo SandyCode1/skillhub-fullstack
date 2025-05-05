@@ -1,9 +1,10 @@
 ﻿using FastEndpoints;
 using SkillHub.Application.Interfaces;
+using SkillHub.UserService.Requests;
 
 namespace SkillHub.UserService.Endpoints
 {
-    public class DeleteUserEndpoint : Endpoint<Guid>
+    public class DeleteUserEndpoint : Endpoint<DeleteUserRequest>
     {
         private readonly IUserService _userService;
         public DeleteUserEndpoint(IUserService userService) => _userService = userService;
@@ -14,9 +15,9 @@ namespace SkillHub.UserService.Endpoints
             AllowAnonymous();
         }
 
-        public override async Task HandleAsync(Guid id, CancellationToken ct)
+        public override async Task HandleAsync(DeleteUserRequest req, CancellationToken ct)
         {
-            var deleted = await _userService.DeleteUserAsync(id);
+            var deleted = await _userService.DeleteUserAsync(req.Id);
             if (!deleted)
             {
                 await SendNotFoundAsync();
